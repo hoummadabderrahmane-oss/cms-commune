@@ -8,7 +8,7 @@ if (isset($_POST['login'])) {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND password = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
