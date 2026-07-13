@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "cms-baladiya-/config/database.php";
+require "cms-baladiya-\config\database.php";
 
 $message = "";
 
