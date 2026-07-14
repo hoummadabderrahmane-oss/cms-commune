@@ -80,7 +80,14 @@ try {
     $citoyens = [];
     $quartiers = [];
 }
+define('SGC_ACCESS', true);
+require_once '../auth/auth_check.php';
+require_once '../config/database.php';
 
+global $currentUser;  // ← AJOUTÉ
+
+$pageTitle = 'Gestion des Citoyens';
+$pageIcon = 'fa-users';
 require_once '../includes/header.php';
 require_once '../includes/sidebar.php';
 require_once '../includes/navbar.php';

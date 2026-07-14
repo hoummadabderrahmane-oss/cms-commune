@@ -31,20 +31,22 @@ $_SESSION['login_time'] = time();
 
 // Variables globales pour les templates
 $currentUser = [
-    'id'      => $_SESSION['user_id'],
-    'nom'     => $_SESSION['nom'],
-    'prenom'  => $_SESSION['prenom'],
-    'email'   => $_SESSION['email'],
-    'role'    => $_SESSION['role'],
-    'commune' => $_SESSION['commune'],
+    'id'      => $_SESSION['user_id'] ?? null,
+    'nom'     => $_SESSION['nom'] ?? '',
+    'prenom'  => $_SESSION['prenom'] ?? '',
+    'email'   => $_SESSION['email'] ?? '',
+    'role'    => $_SESSION['role'] ?? '',
+    'commune' => $_SESSION['commune'] ?? '',
     'avatar'  => $_SESSION['avatar'] ?? 'default.png'
 ];
 
 // Helper: Vérifier les permissions
 function hasRole(string $role): bool {
+    global $currentUser;
     return $currentUser['role'] === $role || $currentUser['role'] === 'super_admin';
 }
 
 function isSuperAdmin(): bool {
+    global $currentUser;
     return $currentUser['role'] === 'super_admin';
 }

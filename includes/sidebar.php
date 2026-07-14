@@ -4,6 +4,8 @@
  * SGC - Sidebar de navigation
  * ============================================
  */
+global $currentUser;  // ← AJOUTÉ
+
 // Déterminer la page active
 $currentPage = basename($_SERVER['PHP_SELF']);
 $currentDir = basename(dirname($_SERVER['PHP_SELF']));
@@ -22,7 +24,7 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
             <span>Tableau de bord</span>
         </a>
         
-        <a href="../citoyens/index.php" class="nav-link <?= ($currentDir == 'citoyens') ? 'active' : '' ?>">
+        <a href="../citizens/index.php" class="nav-link <?= ($currentDir == 'citizens') ? 'active' : '' ?>">
             <i class="fas fa-users"></i>
             <span>Gestion des Citoyens</span>
         </a>
@@ -57,6 +59,6 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
     
     <div class="sidebar-footer">
         <i class="fas fa-code"></i> SGC v1.0<br>
-        <?= htmlspecialchars($currentUser['commune']) ?>
+        <?= htmlspecialchars($currentUser['commune'] ?? 'Commune') ?>
     </div>
 </nav>

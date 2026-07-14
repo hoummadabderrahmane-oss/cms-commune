@@ -4,12 +4,15 @@
  * SGC - Navbar supérieure
  * ============================================
  */
+global $currentUser;  // ← AJOUTÉ
+global $pageTitle;    // ← AJOUTÉ
+global $pageIcon;     // ← AJOUTÉ
 ?>
 <!-- Navbar -->
 <div class="navbar-custom">
     <div class="page-title">
-        <i class="fas <?= $pageIcon ?>"></i>
-        <?= htmlspecialchars($pageTitle) ?>
+        <i class="fas <?= $pageIcon ?? 'fa-home' ?>"></i>
+        <?= htmlspecialchars($pageTitle ?? 'SGC') ?>
     </div>
     
     <div class="navbar-actions">
@@ -33,11 +36,11 @@
         <div class="dropdown">
             <div class="user-dropdown" data-bs-toggle="dropdown">
                 <div class="user-avatar">
-                    <?= strtoupper(substr($currentUser['prenom'], 0, 1) . substr($currentUser['nom'], 0, 1)) ?>
+                    <?= strtoupper(substr($currentUser['prenom'] ?? 'A', 0, 1) . substr($currentUser['nom'] ?? 'D', 0, 1)) ?>
                 </div>
                 <div class="user-info d-none d-md-block">
-                    <div class="user-name"><?= htmlspecialchars($currentUser['prenom'] . ' ' . $currentUser['nom']) ?></div>
-                    <div class="user-role"><?= htmlspecialchars($currentUser['role']) ?></div>
+                    <div class="user-name"><?= htmlspecialchars(($currentUser['prenom'] ?? '') . ' ' . ($currentUser['nom'] ?? '')) ?></div>
+                    <div class="user-role"><?= htmlspecialchars($currentUser['role'] ?? '') ?></div>
                 </div>
                 <i class="fas fa-chevron-down text-muted ms-2" style="font-size: 0.7rem;"></i>
             </div>
