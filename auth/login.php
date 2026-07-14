@@ -4,18 +4,18 @@ require_once "../config/database.php";
 
 if (isset($_SESSION['user_id'])) {
     header("Location: ../admin/dashboard.php");
-        exit;
+        exit();
         }
 
         $error = "";
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-            $email = trim($_POST["email"]);
-                $password = $_POST["password"];
+            $email = trim($_POST['email']);
+                $password = $_POST['password'];
 
                     if (empty($email) || empty($password)) {
-                            $error = "Veuillez remplir tous les champs / يرجى ملء جميع الحقول";
+                            $error = "Veuillez remplir tous les champs.";
                                 } else {
 
                                         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
@@ -25,129 +25,195 @@ if (isset($_SESSION['user_id'])) {
 
                                                                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                                                                                if (password_verify($password, $user["password"])) {
+                                                                                if (password_verify($password, $user['password'])) {
 
-                                                                                                $_SESSION["user_id"] = $user["id"];
-                                                                                                                $_SESSION["full_name"] = $user["full_name"];
-                                                                                                                                $_SESSION["role"] = $user["role"];
+                                                                                                session_regenerate_id(true);
 
-                                                                                                                                                header("Location: ../admin/dashboard.php");
-                                                                                                                                                                exit;
+                                                                                                                $_SESSION['user_id'] = $user['id'];
+                                                                                                                                $_SESSION['full_name'] = $user['full_name'];
+                                                                                                                                                $_SESSION['role'] = $user['role'];
 
-                                                                                                                                                                            } else {
-                                                                                                                                                                                            $error = "Mot de passe incorrect / كلمة المرور غير صحيحة";
-                                                                                                                                                                                                        }
+                                                                                                                                                                header("Location: ../admin/dashboard.php");
+                                                                                                                                                                                exit();
 
-                                                                                                                                                                                                                } else {
-                                                                                                                                                                                                                            $error = "Utilisateur introuvable / المستخدم غير موجود";
-                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                        ?>
+                                                                                                                                                                                            } else {
 
-                                                                                                                                                                                                                                        <!DOCTYPE html>
-                                                                                                                                                                                                                                        <html lang="fr">
-                                                                                                                                                                                                                                        <head>
-                                                                                                                                                                                                                                        <meta charset="UTF-8">
-                                                                                                                                                                                                                                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                                                                                                                                                                                                            $error = "Mot de passe incorrect.";
 
-                                                                                                                                                                                                                                        <title>SGC - Login</title>
+                                                                                                                                                                                                                        }
 
-                                                                                                                                                                                                                                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+                                                                                                                                                                                                                                } else {
 
-                                                                                                                                                                                                                                        <style>
+                                                                                                                                                                                                                                            $error = "Email introuvable.";
 
-                                                                                                                                                                                                                                        body{
-                                                                                                                                                                                                                                            background:#f4f6f9;
-                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                    }
 
-                                                                                                                                                                                                                                            .login-box{
-                                                                                                                                                                                                                                                max-width:420px;
-                                                                                                                                                                                                                                                    margin:auto;
-                                                                                                                                                                                                                                                        margin-top:70px;
-                                                                                                                                                                                                                                                            border-radius:15px;
-                                                                                                                                                                                                                                                                padding:30px;
-                                                                                                                                                                                                                                                                    background:white;
-                                                                                                                                                                                                                                                                        box-shadow:0 0 20px rgba(0,0,0,.1);
-                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                        }
 
-                                                                                                                                                                                                                                                                        .logo{
-                                                                                                                                                                                                                                                                            width:120px;
-                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                        ?>
 
-                                                                                                                                                                                                                                                                            .btn-success{
-                                                                                                                                                                                                                                                                                background:#0B6E4F;
-                                                                                                                                                                                                                                                                                    border:none;
-                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                        <!DOCTYPE html>
+                                                                                                                                                                                                                                                        <html lang="fr">
 
-                                                                                                                                                                                                                                                                                    </style>
+                                                                                                                                                                                                                                                        <head>
 
-                                                                                                                                                                                                                                                                                    </head>
+                                                                                                                                                                                                                                                        <meta charset="UTF-8">
+                                                                                                                                                                                                                                                        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-                                                                                                                                                                                                                                                                                    <body>
+                                                                                                                                                                                                                                                        <title>SGC | Connexion</title>
 
-                                                                                                                                                                                                                                                                                    <div class="login-box text-center">
+                                                                                                                                                                                                                                                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
-                                                                                                                                                                                                                                                                                    <img src="../assets/images/logo.png" class="logo mb-3">
+                                                                                                                                                                                                                                                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-                                                                                                                                                                                                                                                                                    <h3>Système de Gestion Communale</h3>
-                                                                                                                                                                                                                                                                                    <h5>نظام إدارة الجماعة</h5>
+                                                                                                                                                                                                                                                        <style>
 
-                                                                                                                                                                                                                                                                                    <hr>
+                                                                                                                                                                                                                                                        body{
+                                                                                                                                                                                                                                                        background:#eef2f7;
+                                                                                                                                                                                                                                                        height:100vh;
+                                                                                                                                                                                                                                                        display:flex;
+                                                                                                                                                                                                                                                        justify-content:center;
+                                                                                                                                                                                                                                                        align-items:center;
+                                                                                                                                                                                                                                                        font-family:Arial,sans-serif;
+                                                                                                                                                                                                                                                        }
 
-                                                                                                                                                                                                                                                                                    <?php if($error!=""){ ?>
+                                                                                                                                                                                                                                                        .card{
 
-                                                                                                                                                                                                                                                                                    <div class="alert alert-danger">
+                                                                                                                                                                                                                                                        width:430px;
 
-                                                                                                                                                                                                                                                                                    <?= $error ?>
+                                                                                                                                                                                                                                                        border:none;
 
-                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                        border-radius:18px;
 
-                                                                                                                                                                                                                                                                                    <?php } ?>
+                                                                                                                                                                                                                                                        box-shadow:0 10px 30px rgba(0,0,0,.15);
 
-                                                                                                                                                                                                                                                                                    <form method="POST">
+                                                                                                                                                                                                                                                        }
 
-                                                                                                                                                                                                                                                                                    <div class="mb-3 text-start">
+                                                                                                                                                                                                                                                        .logo{
 
-                                                                                                                                                                                                                                                                                    <label>Email</label>
+                                                                                                                                                                                                                                                        width:110px;
 
-                                                                                                                                                                                                                                                                                    <input
-                                                                                                                                                                                                                                                                                    type="email"
-                                                                                                                                                                                                                                                                                    name="email"
-                                                                                                                                                                                                                                                                                    class="form-control"
-                                                                                                                                                                                                                                                                                    required>
+                                                                                                                                                                                                                                                        }
 
-                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                        .btn-main{
 
-                                                                                                                                                                                                                                                                                    <div class="mb-3 text-start">
+                                                                                                                                                                                                                                                        background:#0B6E4F;
 
-                                                                                                                                                                                                                                                                                    <label>Mot de passe</label>
+                                                                                                                                                                                                                                                        color:white;
 
-                                                                                                                                                                                                                                                                                    <input
-                                                                                                                                                                                                                                                                                    type="password"
-                                                                                                                                                                                                                                                                                    name="password"
-                                                                                                                                                                                                                                                                                    class="form-control"
-                                                                                                                                                                                                                                                                                    required>
+                                                                                                                                                                                                                                                        }
 
-                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                        .btn-main:hover{
 
-                                                                                                                                                                                                                                                                                    <button class="btn btn-success w-100">
+                                                                                                                                                                                                                                                        background:#09553d;
 
-                                                                                                                                                                                                                                                                                    Se connecter | تسجيل الدخول
+                                                                                                                                                                                                                                                        color:white;
 
-                                                                                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                                                        }
 
-                                                                                                                                                                                                                                                                                    </form>
+                                                                                                                                                                                                                                                        </style>
 
-                                                                                                                                                                                                                                                                                    <hr>
+                                                                                                                                                                                                                                                        </head>
 
-                                                                                                                                                                                                                                                                                    <small>
+                                                                                                                                                                                                                                                        <body>
 
-                                                                                                                                                                                                                                                                                    © 2026 Commune
+                                                                                                                                                                                                                                                        <div class="card">
 
-                                                                                                                                                                                                                                                                                    </small>
+                                                                                                                                                                                                                                                        <div class="card-body p-4">
 
-                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                        <div class="text-center">
 
-                                                                                                                                                                                                                                                                                    </body>
-                                                                                                                                                                                                                                                                                    </html>
+                                                                                                                                                                                                                                                        <img src="../assets/images/logo.png" class="logo mb-3">
+
+                                                                                                                                                                                                                                                        <h4>Système de Gestion Communale</h4>
+
+                                                                                                                                                                                                                                                        <p class="text-muted">
+
+                                                                                                                                                                                                                                                        نظام إدارة الجماعة
+
+                                                                                                                                                                                                                                                        </p>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        <?php if($error!=""){ ?>
+
+                                                                                                                                                                                                                                                        <div class="alert alert-danger">
+
+                                                                                                                                                                                                                                                        <?= $error ?>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        <?php } ?>
+
+                                                                                                                                                                                                                                                        <form method="POST">
+
+                                                                                                                                                                                                                                                        <div class="mb-3">
+
+                                                                                                                                                                                                                                                        <label>Email</label>
+
+                                                                                                                                                                                                                                                        <div class="input-group">
+
+                                                                                                                                                                                                                                                        <span class="input-group-text">
+
+                                                                                                                                                                                                                                                        <i class="fa fa-envelope"></i>
+
+                                                                                                                                                                                                                                                        </span>
+
+                                                                                                                                                                                                                                                        <input
+                                                                                                                                                                                                                                                        type="email"
+                                                                                                                                                                                                                                                        name="email"
+                                                                                                                                                                                                                                                        class="form-control"
+                                                                                                                                                                                                                                                        required>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        <div class="mb-4">
+
+                                                                                                                                                                                                                                                        <label>Mot de passe</label>
+
+                                                                                                                                                                                                                                                        <div class="input-group">
+
+                                                                                                                                                                                                                                                        <span class="input-group-text">
+
+                                                                                                                                                                                                                                                        <i class="fa fa-lock"></i>
+
+                                                                                                                                                                                                                                                        </span>
+
+                                                                                                                                                                                                                                                        <input
+                                                                                                                                                                                                                                                        type="password"
+                                                                                                                                                                                                                                                        name="password"
+                                                                                                                                                                                                                                                        class="form-control"
+                                                                                                                                                                                                                                                        required>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        <button class="btn btn-main w-100">
+
+                                                                                                                                                                                                                                                        <i class="fa fa-right-to-bracket"></i>
+
+                                                                                                                                                                                                                                                        Se connecter
+
+                                                                                                                                                                                                                                                        </button>
+
+                                                                                                                                                                                                                                                        </form>
+
+                                                                                                                                                                                                                                                        <hr>
+
+                                                                                                                                                                                                                                                        <div class="text-center text-muted">
+
+                                                                                                                                                                                                                                                        SGC Version 1.0
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                                                                        </body>
+
+                                                                                                                                                                                                                                                        </html>
