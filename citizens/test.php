@@ -33,3 +33,4 @@ echo "<b>5. header.php:</b> " . (file_exists(__DIR__ . '/../includes/header.php'
 echo " — <b>footer.php:</b> " . (file_exists(__DIR__ . '/../includes/footer.php') ? "<span style='color:green'>OK</span>" : "<span style='color:red'>MISSING</span>") . "<br>";
 
 echo "<hr>If all 5 are green, index.php has no reason to fail.";
+echo "<pre>" . print_r($pdo->query("SHOW COLUMNS FROM citoyens")->fetchAll(PDO::FETCH_ASSOC), true) . "</pre>";
