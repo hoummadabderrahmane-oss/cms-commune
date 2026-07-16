@@ -32,9 +32,9 @@ if (empty($basePath)) $basePath = '../';
             <span>Gestion des Citoyens</span>
         </a>
         
-        <a href="#" class="nav-link">
-            <i class="fas fa-file-alt"></i>
-            <span>Documents</span>
+        <a href="<?= $basePath ?>documents/index.php" class="nav-link <?= ($currentDir == 'documents') ? 'active' : '' ?>">
+           <i class="fas fa-file-alt"></i>
+           <span>Documents</span>
         </a>
         
         <a href="#" class="nav-link">
