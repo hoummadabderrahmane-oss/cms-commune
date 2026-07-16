@@ -7,7 +7,16 @@
 define('SGC_ACCESS', true);
 
 // Chemin absolu vers la racine du projet
-define('BASE_PATH', dirname(__DIR__));
+$basePath = realpath(dirname(__DIR__));
+
+// Vérifier si config/database.php existe
+if (!file_exists($basePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'database.php')) {
+    die("<h1>❌ Erreur</h1>
+    <p>Fichier config/database.php non trouvé à: " . $basePath . "\\config\\database.php</p>
+    <p>Vérifiez que le fichier existe.</p>");
+}
+
+define('BASE_PATH', $basePath);
 
 require_once BASE_PATH . DIRECTORY_SEPARATOR . 'auth' . DIRECTORY_SEPARATOR . 'auth_check.php';
 require_once BASE_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'database.php';
