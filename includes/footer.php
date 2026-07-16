@@ -1,18 +1,21 @@
 <?php
 /**
  * ============================================
- * SGC - Footer commun
+ * CMS Baladiya - Footer Bootstrap 4
  * ============================================
  */
 ?>
     </div><!-- /.main-content -->
     
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Scripts Bootstrap 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
@@ -30,10 +33,10 @@
         });
         
         // Confirmation de suppression
-        function confirmDelete(url, message = 'Êtes-vous sûr de vouloir supprimer cet élément ?') {
+        function confirmDelete(url, message) {
             Swal.fire({
                 title: 'Confirmation',
-                text: message,
+                text: message || 'Êtes-vous sûr de vouloir supprimer cet élément ?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d32f2f',

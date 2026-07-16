@@ -1,40 +1,39 @@
 <?php
 /**
  * ============================================
- * SGC - Navbar supérieure
+ * CMS Baladiya - Navbar Bootstrap 4
  * ============================================
  */
-global $currentUser;  // ← AJOUTÉ
-global $pageTitle;    // ← AJOUTÉ
-global $pageIcon;     // ← AJOUTÉ
+global $currentUser;
+global $pageTitle;
+global $pageIcon;
 ?>
-<!-- Navbar -->
 <div class="navbar-custom">
     <div class="page-title">
         <i class="fas <?= $pageIcon ?? 'fa-home' ?>"></i>
-        <?= htmlspecialchars($pageTitle ?? 'SGC') ?>
+        <?= htmlspecialchars($pageTitle ?? 'CMS Baladiya') ?>
     </div>
     
     <div class="navbar-actions">
         <!-- Notifications -->
         <div class="dropdown">
-            <button class="btn btn-link text-dark position-relative" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-link text-dark position-relative" type="button" data-toggle="dropdown">
                 <i class="fas fa-bell fa-lg"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                <span class="position-absolute badge badge-danger rounded-pill" style="font-size: 0.6rem; top: -5px; right: -5px;">
                     3
                 </span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li><h6 class="dropdown-header">Notifications</h6></li>
-                <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus text-success me-2"></i>Nouveau citoyen ajouté</a></li>
-                <li><a class="dropdown-item" href="#"><i class="fas fa-file text-primary me-2"></i>Document expiré</a></li>
-                <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation text-warning me-2"></i>Alerte système</a></li>
-            </ul>
+            <div class="dropdown-menu dropdown-menu-right shadow">
+                <h6 class="dropdown-header">Notifications</h6>
+                <a class="dropdown-item" href="#"><i class="fas fa-user-plus text-success mr-2"></i>Nouveau citoyen ajouté</a>
+                <a class="dropdown-item" href="#"><i class="fas fa-file text-primary mr-2"></i>Document expiré</a>
+                <a class="dropdown-item" href="#"><i class="fas fa-exclamation text-warning mr-2"></i>Alerte système</a>
+            </div>
         </div>
         
         <!-- User Dropdown -->
         <div class="dropdown">
-            <div class="user-dropdown" data-bs-toggle="dropdown">
+            <div class="user-dropdown" data-toggle="dropdown">
                 <div class="user-avatar">
                     <?= strtoupper(substr($currentUser['prenom'] ?? 'A', 0, 1) . substr($currentUser['nom'] ?? 'D', 0, 1)) ?>
                 </div>
@@ -42,14 +41,14 @@ global $pageIcon;     // ← AJOUTÉ
                     <div class="user-name"><?= htmlspecialchars(($currentUser['prenom'] ?? '') . ' ' . ($currentUser['nom'] ?? '')) ?></div>
                     <div class="user-role"><?= htmlspecialchars($currentUser['role'] ?? '') ?></div>
                 </div>
-                <i class="fas fa-chevron-down text-muted ms-2" style="font-size: 0.7rem;"></i>
+                <i class="fas fa-chevron-down text-muted ml-2" style="font-size: 0.7rem;"></i>
             </div>
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mon profil</a></li>
-                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="../auth/logout.php"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
-            </ul>
+            <div class="dropdown-menu dropdown-menu-right shadow">
+                <a class="dropdown-item" href="#"><i class="fas fa-user mr-2"></i>Mon profil</a>
+                <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Paramètres</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-danger" href="../auth/logout.php"><i class="fas fa-sign-out-alt mr-2"></i>Déconnexion</a>
+            </div>
         </div>
     </div>
 </div>
