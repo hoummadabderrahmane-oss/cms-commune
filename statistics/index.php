@@ -4,37 +4,34 @@
  * CMS Baladiya - Statistiques
  * ============================================
  */
-define('SGC_ACCESS', true);
+session_start();
+require_once __DIR__ . '/../config/database.php';
+$pdo = getDB();
 
-$basePath = dirname(__DIR__);
-define('BASE_PATH', $basePath);
-
-require_once BASE_PATH . '/auth/auth_check.php';
-require_once BASE_PATH . '/config/database.php';
-
-global $currentUser;
+if (empty($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    header('Location: ../auth/login.php');
+    exit;
+}
 
 $pageTitle = 'Statistiques';
-$pageIcon = 'fa-chart-bar';
+require_once __DIR__ . '/../includes/header.php';
 
 try {
-    $db = getDB();
-
     // ===== CITOYENS =====
-    $totalCitoyens = $db->query("SELECT COUNT(*) FROM citoyens WHERE statut = 'actif'")->fetchColumn();
-    $totalHommes = $db->query("SELECT COUNT(*) FROM citoyens WHERE sexe = 'M' AND statut = 'actif'")->fetchColumn();
-    $totalFemmes = $db->query("SELECT COUNT(*) FROM citoyens WHERE sexe = 'F' AND statut = 'actif'")->fetchColumn();
-    $totalInactifs = $db->query("SELECT COUNT(*) FROM citoyens WHERE statut = 'inactif'")->fetchColumn();
+    $totalCitoyens = $pdo->query("SELECT COUNT(*) FROM citoyens WHERE statut = 'actif'")->fetchColumn();
+    $totalHommes = $pdo->query("SELECT COUNT(*) FROM citoyens WHERE sexe = 'M' AND statut = 'actif'")->fetchColumn();
+    $totalFemmes = $pdo->query("SELECT COUNT(*) FROM citoyens WHERE sexe = 'F' AND statut = 'actif'")->fetchColumn();
+    $totalInactifs = $pdo->query("SELECT COUNT(*) FROM citoyens WHERE statut = 'inactif'")->fetchColumn();
 
     // Répartition par sexe
     $sexeData = [
         'labels' => ['Hommes', 'Femmes'],
-        'data' => [$totalHommes, $totalFemmes],
+        'data' => [(int)$totalHommes, (int)$totalFemmes],
         'colors' => ['#3498db', '#e91e63']
     ];
 
     // Répartition par âge
-    $stmt = $db->query("
+    $stmt = $pdo->query("
         SELECT 
             CASE 
                 WHEN TIMESTAMPDIFF(YEAR, date_naissance, CURDATE()) < 18 THEN 'Moins de 18'
@@ -53,7 +50,7 @@ try {
     $ageGroups = $stmt->fetchAll();
 
     // Répartition par quartier
-    $stmt = $db->query("
+    $stmt = $pdo->query("
         SELECT quartier, COUNT(*) as total 
         FROM citoyens 
         WHERE statut = 'actif' AND quartier IS NOT NULL AND quartier != '' 
@@ -63,7 +60,7 @@ try {
     $quartiers = $stmt->fetchAll();
 
     // Évolution mensuelle (12 derniers mois)
-    $stmt = $db->query("
+    $stmt = $pdo->query("
         SELECT 
             DATE_FORMAT(created_at, '%Y-%m') as mois,
             DATE_FORMAT(created_at, '%m/%Y') as mois_label,
@@ -76,13 +73,13 @@ try {
     $evolution = $stmt->fetchAll();
 
     // ===== DOCUMENTS =====
-    $totalDocuments = $db->query("SELECT COUNT(*) FROM documents")->fetchColumn();
-    $docsValides = $db->query("SELECT COUNT(*) FROM documents WHERE statut = 'valide'")->fetchColumn();
-    $docsExpires = $db->query("SELECT COUNT(*) FROM documents WHERE statut = 'expire'")->fetchColumn();
-    $docsAnnules = $db->query("SELECT COUNT(*) FROM documents WHERE statut = 'annule'")->fetchColumn();
+    $totalDocuments = $pdo->query("SELECT COUNT(*) FROM documents")->fetchColumn();
+    $docsValides = $pdo->query("SELECT COUNT(*) FROM documents WHERE statut = 'valide'")->fetchColumn();
+    $docsExpires = $pdo->query("SELECT COUNT(*) FROM documents WHERE statut = 'expire'")->fetchColumn();
+    $docsAnnules = $pdo->query("SELECT COUNT(*) FROM documents WHERE statut = 'annule'")->fetchColumn();
 
     // Documents par type
-    $stmt = $db->query("
+    $stmt = $pdo->query("
         SELECT type_document, COUNT(*) as total 
         FROM documents 
         GROUP BY type_document 
@@ -90,25 +87,11 @@ try {
     ");
     $docTypes = $stmt->fetchAll();
 
-    // Documents par mois
-    $stmt = $db->query("
-        SELECT 
-            DATE_FORMAT(created_at, '%Y-%m') as mois,
-            DATE_FORMAT(created_at, '%m/%Y') as mois_label,
-            COUNT(*) as total
-        FROM documents
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-        GROUP BY mois
-        ORDER BY mois
-    ");
-    $docsParMois = $stmt->fetchAll();
-
     // ===== UTILISATEURS =====
-    $totalAgents = $db->query("SELECT COUNT(*) FROM utilisateurs WHERE statut = 'actif'")->fetchColumn();
-    $totalAdmins = $db->query("SELECT COUNT(*) FROM utilisateurs WHERE role = 'admin' AND statut = 'actif'")->fetchColumn();
+    $totalAgents = $pdo->query("SELECT COUNT(*) FROM utilisateurs WHERE statut = 'actif'")->fetchColumn();
 
-    // Activité récente
-    $stmt = $db->query("
+    // Top agents
+    $stmt = $pdo->query("
         SELECT 
             u.prenom, u.nom, u.role,
             COUNT(c.id) as citoyens_crees
@@ -124,87 +107,94 @@ try {
 } catch (PDOException $e) {
     die("Erreur base de données: " . $e->getMessage());
 }
-
-$includesPath = BASE_PATH . '/includes/';
-require_once $includesPath . 'header.php';
-require_once $includesPath . 'sidebar.php';
-require_once $includesPath . 'navbar.php';
 ?>
 
-<div class="main-content">
+<div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-1 font-weight-bold">Statistiques</h4>
+            <h4 class="mb-1 fw-bold">Statistiques</h4>
             <p class="text-muted mb-0">Vue d'ensemble du système</p>
         </div>
         <div class="text-muted small">
-            <i class="far fa-calendar-alt mr-1"></i> <?= date('d/m/Y') ?>
+            <i class="bi bi-calendar3 me-1"></i> <?= date('d/m/Y') ?>
         </div>
     </div>
 
     <!-- KPI Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <div class="stat-card text-center">
-                <div class="stat-number text-success"><?= number_format($totalCitoyens) ?></div>
-                <div class="stat-label">Citoyens</div>
+    <div class="row g-3 mb-4">
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="display-6 fw-bold text-success"><?= number_format($totalCitoyens) ?></div>
+                    <div class="text-muted small">Citoyens</div>
+                </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <div class="stat-card text-center">
-                <div class="stat-number text-primary"><?= number_format($totalHommes) ?></div>
-                <div class="stat-label">Hommes</div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="display-6 fw-bold text-primary"><?= number_format($totalHommes) ?></div>
+                    <div class="text-muted small">Hommes</div>
+                </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <div class="stat-card text-center">
-                <div class="stat-number" style="color:#e91e63"><?= number_format($totalFemmes) ?></div>
-                <div class="stat-label">Femmes</div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="display-6 fw-bold" style="color:#e91e63"><?= number_format($totalFemmes) ?></div>
+                    <div class="text-muted small">Femmes</div>
+                </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <div class="stat-card text-center">
-                <div class="stat-number text-warning"><?= number_format($totalDocuments) ?></div>
-                <div class="stat-label">Documents</div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="display-6 fw-bold text-warning"><?= number_format($totalDocuments) ?></div>
+                    <div class="text-muted small">Documents</div>
+                </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <div class="stat-card text-center">
-                <div class="stat-number text-info"><?= number_format($totalAgents) ?></div>
-                <div class="stat-label">Agents</div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="display-6 fw-bold text-info"><?= number_format($totalAgents) ?></div>
+                    <div class="text-muted small">Agents</div>
+                </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <div class="stat-card text-center">
-                <div class="stat-number text-danger"><?= number_format($totalInactifs) ?></div>
-                <div class="stat-label">Inactifs</div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="display-6 fw-bold text-danger"><?= number_format($totalInactifs) ?></div>
+                    <div class="text-muted small">Inactifs</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- Répartition par sexe -->
-        <div class="col-lg-4 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-venus-mars mr-2 text-primary"></i>Répartition par sexe</h5>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-gender-ambiguous me-2 text-primary"></i>Répartition par sexe</h5>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <canvas id="sexeChart" height="220"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Répartition par âge -->
-        <div class="col-lg-4 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2 text-warning"></i>Répartition par âge</h5>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-cake2 me-2 text-warning"></i>Répartition par âge</h5>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <?php if (empty($ageGroups)): ?>
                         <div class="text-center text-muted py-5">
-                            <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                            <i class="bi bi-bar-chart-line fs-1 mb-3 d-block"></i>
                             <p>Aucune donnée disponible</p>
                         </div>
                     <?php else: ?>
@@ -215,29 +205,29 @@ require_once $includesPath . 'navbar.php';
         </div>
 
         <!-- Statut des documents -->
-        <div class="col-lg-4 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-file-alt mr-2 text-success"></i>Statut des documents</h5>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2 text-success"></i>Statut des documents</h5>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <canvas id="docStatusChart" height="220"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4 mt-1">
         <!-- Évolution citoyens -->
-        <div class="col-lg-8 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-line mr-2 text-info"></i>Évolution des citoyens (12 derniers mois)</h5>
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2 text-info"></i>Évolution des citoyens (12 derniers mois)</h5>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <?php if (empty($evolution)): ?>
                         <div class="text-center text-muted py-5">
-                            <i class="fas fa-chart-line fa-3x mb-3"></i>
+                            <i class="bi bi-graph-up fs-1 mb-3 d-block"></i>
                             <p>Aucune donnée disponible</p>
                         </div>
                     <?php else: ?>
@@ -248,32 +238,34 @@ require_once $includesPath . 'navbar.php';
         </div>
 
         <!-- Top agents -->
-        <div class="col-lg-4 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-trophy mr-2 text-warning"></i>Top agents</h5>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-trophy me-2 text-warning"></i>Top agents</h5>
                 </div>
-                <div class="p-0">
+                <div class="card-body p-0">
                     <?php if (empty($topAgents)): ?>
                         <div class="p-4 text-center text-muted">
-                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                            <i class="bi bi-inbox fs-2 mb-2 d-block"></i>
                             <p>Aucune donnée</p>
                         </div>
                     <?php else: ?>
                         <div class="list-group list-group-flush">
                             <?php foreach ($topAgents as $i => $agent): ?>
                                 <div class="list-group-item d-flex align-items-center py-3">
-                                    <div class="mr-3" style="width:30px;text-align:center;font-weight:bold;color:<?= $i < 3 ? '#1a5f2a' : '#999' ?>">
+                                    <div class="me-3" style="width:30px;text-align:center;font-weight:bold;color:<?= $i < 3 ? '#198754' : '#6c757d' ?>">
                                         <?= $i + 1 ?>
                                     </div>
-                                    <div class="user-avatar mr-3 flex-shrink-0" style="width:38px;height:38px;font-size:0.8rem;">
-                                        <?= strtoupper(substr($agent['prenom'], 0, 1) . substr($agent['nom'], 0, 1)) ?>
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width:38px;height:38px;font-size:0.85rem;font-weight:bold;">
+                                            <?= strtoupper(substr($agent['prenom'], 0, 1) . substr($agent['nom'], 0, 1)) ?>
+                                        </div>
                                     </div>
                                     <div class="flex-grow-1 min-width-0">
-                                        <div class="font-weight-bold text-truncate"><?= htmlspecialchars($agent['prenom'] . ' ' . $agent['nom']) ?></div>
+                                        <div class="fw-bold text-truncate"><?= htmlspecialchars($agent['prenom'] . ' ' . $agent['nom']) ?></div>
                                         <small class="text-muted"><?= ucfirst($agent['role']) ?></small>
                                     </div>
-                                    <span class="badge badge-success"><?= $agent['citoyens_crees'] ?></span>
+                                    <span class="badge bg-success"><?= $agent['citoyens_crees'] ?></span>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -283,17 +275,17 @@ require_once $includesPath . 'navbar.php';
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4 mt-1">
         <!-- Répartition par quartier -->
-        <div class="col-lg-6 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2 text-danger"></i>Répartition par quartier</h5>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt me-2 text-danger"></i>Répartition par quartier</h5>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <?php if (empty($quartiers)): ?>
                         <div class="text-center text-muted py-5">
-                            <i class="fas fa-map fa-3x mb-3"></i>
+                            <i class="bi bi-map fs-1 mb-3 d-block"></i>
                             <p>Aucune donnée disponible</p>
                         </div>
                     <?php else: ?>
@@ -304,15 +296,15 @@ require_once $includesPath . 'navbar.php';
         </div>
 
         <!-- Documents par type -->
-        <div class="col-lg-6 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-folder-open mr-2 text-primary"></i>Documents par type</h5>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-folder2-open me-2 text-primary"></i>Documents par type</h5>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <?php if (empty($docTypes)): ?>
                         <div class="text-center text-muted py-5">
-                            <i class="fas fa-folder fa-3x mb-3"></i>
+                            <i class="bi bi-folder fs-1 mb-3 d-block"></i>
                             <p>Aucune donnée disponible</p>
                         </div>
                     <?php else: ?>
@@ -324,16 +316,16 @@ require_once $includesPath . 'navbar.php';
     </div>
 
     <!-- Tableau récapitulatif documents -->
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="data-table-card">
-                <div class="data-table-header">
-                    <h5 class="mb-0"><i class="fas fa-table mr-2 text-secondary"></i>Récapitulatif des documents</h5>
+    <div class="row g-4 mt-1 mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-table me-2 text-secondary"></i>Récapitulatif des documents</h5>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered text-center">
-                            <thead class="thead-light">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Total</th>
                                     <th class="text-success">Validés</th>
@@ -344,15 +336,15 @@ require_once $includesPath . 'navbar.php';
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-weight-bold"><?= number_format($totalDocuments) ?></td>
-                                    <td class="text-success font-weight-bold"><?= number_format($docsValides) ?></td>
-                                    <td class="text-warning font-weight-bold"><?= number_format($docsExpires) ?></td>
-                                    <td class="text-danger font-weight-bold"><?= number_format($docsAnnules) ?></td>
-                                    <td>
+                                    <td class="fw-bold"><?= number_format($totalDocuments) ?></td>
+                                    <td class="text-success fw-bold"><?= number_format($docsValides) ?></td>
+                                    <td class="text-warning fw-bold"><?= number_format($docsExpires) ?></td>
+                                    <td class="text-danger fw-bold"><?= number_format($docsAnnules) ?></td>
+                                    <td style="min-width:200px">
                                         <?php 
                                         $taux = $totalDocuments > 0 ? round(($docsValides / $totalDocuments) * 100, 1) : 0;
                                         ?>
-                                        <div class="progress" style="height:20px">
+                                        <div class="progress" style="height:22px">
                                             <div class="progress-bar bg-success" role="progressbar" style="width:<?= $taux ?>%">
                                                 <?= $taux ?>%
                                             </div>
@@ -368,6 +360,7 @@ require_once $includesPath . 'navbar.php';
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
     // Répartition par sexe (Doughnut)
     new Chart(document.getElementById('sexeChart'), {
@@ -384,7 +377,7 @@ require_once $includesPath . 'navbar.php';
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: { position: 'bottom' }
+            plugins: { legend: { position: 'bottom' } }
         }
     });
 
@@ -404,10 +397,8 @@ require_once $includesPath . 'navbar.php';
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: { display: false },
-            scales: {
-                yAxes: [{ ticks: { beginAtZero: true, stepSize: 1 } }]
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
         }
     });
     <?php endif; ?>
@@ -419,7 +410,7 @@ require_once $includesPath . 'navbar.php';
             labels: ['Validés', 'Expirés', 'Annulés'],
             datasets: [{
                 data: [<?= $docsValides ?>, <?= $docsExpires ?>, <?= $docsAnnules ?>],
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                backgroundColor: ['#198754', '#ffc107', '#dc3545'],
                 borderWidth: 2,
                 borderColor: '#fff'
             }]
@@ -427,7 +418,7 @@ require_once $includesPath . 'navbar.php';
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: { position: 'bottom' }
+            plugins: { legend: { position: 'bottom' } }
         }
     });
 
@@ -440,20 +431,18 @@ require_once $includesPath . 'navbar.php';
             datasets: [{
                 label: 'Citoyens ajoutés',
                 data: <?= json_encode(array_column($evolution, 'total')) ?>,
-                borderColor: '#1a5f2a',
-                backgroundColor: 'rgba(26, 95, 42, 0.1)',
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
                 fill: true,
                 tension: 0.4,
-                pointBackgroundColor: '#1a5f2a',
+                pointBackgroundColor: '#198754',
                 pointRadius: 4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                yAxes: [{ ticks: { beginAtZero: true, stepSize: 1 } }]
-            }
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
         }
     });
     <?php endif; ?>
@@ -461,14 +450,14 @@ require_once $includesPath . 'navbar.php';
     // Quartiers (Horizontal Bar)
     <?php if (!empty($quartiers)): ?>
     new Chart(document.getElementById('quartierChart'), {
-        type: 'horizontalBar',
+        type: 'bar',
         data: {
             labels: <?= json_encode(array_column($quartiers, 'quartier')) ?>,
             datasets: [{
                 label: 'Citoyens',
                 data: <?= json_encode(array_column($quartiers, 'total')) ?>,
-                backgroundColor: 'rgba(26, 95, 42, 0.8)',
-                borderColor: '#1a5f2a',
+                backgroundColor: 'rgba(25, 135, 84, 0.8)',
+                borderColor: '#198754',
                 borderWidth: 1,
                 borderRadius: 6
             }]
@@ -476,10 +465,9 @@ require_once $includesPath . 'navbar.php';
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: { display: false },
-            scales: {
-                xAxes: [{ ticks: { beginAtZero: true, stepSize: 1 } }]
-            }
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }
         }
     });
     <?php endif; ?>
@@ -493,20 +481,18 @@ require_once $includesPath . 'navbar.php';
             datasets: [{
                 label: 'Documents',
                 data: <?= json_encode(array_column($docTypes, 'total')) ?>,
-                backgroundColor: ['#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b'],
+                backgroundColor: ['#0d6efd', '#0dcaf0', '#20c997', '#198754', '#ffc107', '#fd7e14', '#dc3545', '#6f42c1'],
                 borderRadius: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: { display: false },
-            scales: {
-                yAxes: [{ ticks: { beginAtZero: true, stepSize: 1 } }]
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
         }
     });
     <?php endif; ?>
 </script>
 
-<?php require_once $includesPath . 'footer.php'; ?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
