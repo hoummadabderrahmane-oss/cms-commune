@@ -19,7 +19,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
-        // Initialisation DataTables
         $(document).ready(function() {
             if ($('.data-table').length) {
                 $('.data-table').DataTable({
@@ -32,11 +31,10 @@
             }
         });
         
-        // Confirmation de suppression
         function confirmDelete(url, message) {
             Swal.fire({
                 title: 'Confirmation',
-                text: message || 'Êtes-vous sûr de vouloir supprimer cet élément ?',
+                text: message || 'Êtes-vous sûr ?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d32f2f',
@@ -50,7 +48,6 @@
             });
         }
         
-        // Notifications toast
         function showToast(type, message) {
             const Toast = Swal.mixin({
                 toast: true,
@@ -66,7 +63,6 @@
             });
         }
         
-        // Afficher les messages de session
         <?php if (isset($_SESSION['success'])): ?>
             showToast('success', '<?= addslashes($_SESSION['success']) ?>');
             <?php unset($_SESSION['success']); ?>

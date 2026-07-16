@@ -7,6 +7,11 @@
 global $currentUser;
 global $pageTitle;
 global $pageIcon;
+
+// Détecter le niveau de profondeur
+$depth = substr_count($_SERVER['PHP_SELF'], '/') - 2;
+$basePath = str_repeat('../', max(0, $depth - 1));
+if (empty($basePath)) $basePath = '../';
 ?>
 <div class="navbar-custom">
     <div class="page-title">
@@ -15,7 +20,6 @@ global $pageIcon;
     </div>
     
     <div class="navbar-actions">
-        <!-- Notifications -->
         <div class="dropdown">
             <button class="btn btn-link text-dark position-relative" type="button" data-toggle="dropdown">
                 <i class="fas fa-bell fa-lg"></i>
@@ -31,7 +35,6 @@ global $pageIcon;
             </div>
         </div>
         
-        <!-- User Dropdown -->
         <div class="dropdown">
             <div class="user-dropdown" data-toggle="dropdown">
                 <div class="user-avatar">
@@ -47,7 +50,7 @@ global $pageIcon;
                 <a class="dropdown-item" href="#"><i class="fas fa-user mr-2"></i>Mon profil</a>
                 <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Paramètres</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-danger" href="../auth/logout.php"><i class="fas fa-sign-out-alt mr-2"></i>Déconnexion</a>
+                <a class="dropdown-item text-danger" href="<?= $basePath ?>auth/logout.php"><i class="fas fa-sign-out-alt mr-2"></i>Déconnexion</a>
             </div>
         </div>
     </div>

@@ -1,30 +1,33 @@
 <?php
 /**
  * ============================================
- * SGC - Sidebar de navigation
+ * CMS Baladiya - Sidebar Bootstrap 4
  * ============================================
  */
-global $currentUser;  // ← AJOUTÉ
+global $currentUser;
 
-// Déterminer la page active
 $currentPage = basename($_SERVER['PHP_SELF']);
 $currentDir = basename(dirname($_SERVER['PHP_SELF']));
+
+// Détecter le niveau de profondeur
+$depth = substr_count($_SERVER['PHP_SELF'], '/') - 2; // -2 pour /sgc/ et /fichier.php
+$basePath = str_repeat('../', max(0, $depth - 1));
+if (empty($basePath)) $basePath = '../';
 ?>
-<!-- Sidebar -->
 <nav class="sidebar">
     <div class="sidebar-brand">
-        <i class="fas fa-city"></i>
-        <h4>SGC</h4>
-        <small>Système de Gestion des Citoyens</small>
+        <i class="fas fa-landmark"></i>
+        <h4>CMS Baladiya</h4>
+        <small>Système de Gestion Municipale</small>
     </div>
     
     <div class="sidebar-menu">
-        <a href="../admin/dashboard.php" class="nav-link <?= ($currentPage == 'dashboard.php') ? 'active' : '' ?>">
+        <a href="<?= $basePath ?>admin/dashboard.php" class="nav-link <?= ($currentPage == 'dashboard.php') ? 'active' : '' ?>">
             <i class="fas fa-tachometer-alt"></i>
             <span>Tableau de bord</span>
         </a>
         
-        <a href="../citizens/index.php" class="nav-link <?= ($currentDir == 'citizens') ? 'active' : '' ?>">
+        <a href="<?= $basePath ?>citizens/index.php" class="nav-link <?= ($currentDir == 'citizens') ? 'active' : '' ?>">
             <i class="fas fa-users"></i>
             <span>Gestion des Citoyens</span>
         </a>
@@ -58,7 +61,7 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
     </div>
     
     <div class="sidebar-footer">
-        <i class="fas fa-code"></i> SGC v1.0<br>
+        <i class="fas fa-code"></i> CMS Baladiya v1.0<br>
         <?= htmlspecialchars($currentUser['commune'] ?? 'Commune') ?>
     </div>
 </nav>

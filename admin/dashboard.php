@@ -5,8 +5,12 @@
  * ============================================
  */
 define('SGC_ACCESS', true);
-require_once '../auth/auth_check.php';
-require_once '../config/database.php';
+
+// Chemin absolu vers la racine du projet
+define('BASE_PATH', dirname(__DIR__));
+
+require_once BASE_PATH . DIRECTORY_SEPARATOR . 'auth' . DIRECTORY_SEPARATOR . 'auth_check.php';
+require_once BASE_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'database.php';
 
 global $currentUser;
 
@@ -16,16 +20,13 @@ $pageIcon = 'fa-tachometer-alt';
 try {
     $db = getDB();
     
-    // Statistiques
     $stats = [
         'total_citoyens' => $db->query("SELECT COUNT(*) FROM citoyens WHERE statut = 'actif'")->fetchColumn(),
         'total_hommes' => $db->query("SELECT COUNT(*) FROM citoyens WHERE sexe = 'M' AND statut = 'actif'")->fetchColumn(),
         'total_femmes' => $db->query("SELECT COUNT(*) FROM citoyens WHERE sexe = 'F' AND statut = 'actif'")->fetchColumn(),
-        'total_documents' => $db->query("SELECT COUNT(*) FROM documents WHERE statut = 'valide'")->fetchColumn(),
-        'nouveaux_mois' => $db->query("SELECT COUNT(*) FROM citoyens WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")->fetchColumn()
+        'total_documents' => $db->query("SELECT COUNT(*) FROM documents WHERE statut = 'valide'")->fetchColumn()
     ];
     
-    // Derniers citoyens ajoutés
     $stmt = $db->query("
         SELECT c.*, u.prenom as agent_prenom, u.nom as agent_nom 
         FROM citoyens c 
@@ -35,7 +36,6 @@ try {
     ");
     $derniersCitoyens = $stmt->fetchAll();
     
-    // Citoyens par quartier (pour le graphique)
     $stmt = $db->query("
         SELECT quartier, COUNT(*) as total 
         FROM citoyens 
@@ -47,15 +47,17 @@ try {
     $quartiers = $stmt->fetchAll();
     
 } catch (PDOException $e) {
-    error_log("Erreur dashboard: " . $e->getMessage());
-    $stats = ['total_citoyens' => 0, 'total_hommes' => 0, 'total_femmes' => 0, 'total_documents' => 0, 'nouveaux_mois' => 0];
+    $stats = ['total_citoyens' => 0, 'total_hommes' => 0, 'total_femmes' => 0, 'total_documents' => 0];
     $derniersCitoyens = [];
     $quartiers = [];
 }
 
-require_once '../includes/header.php';
-require_once '../includes/sidebar.php';
-require_once '../includes/navbar.php';
+// Chemins absolus pour includes
+$includesPath = BASE_PATH . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR;
+
+require_once $includesPath . 'header.php';
+require_once $includesPath . 'sidebar.php';
+require_once $includesPath . 'navbar.php';
 ?>
 
 <div class="main-content">
@@ -226,7 +228,6 @@ require_once '../includes/navbar.php';
 </div>
 
 <script>
-    // Graphique des quartiers
     <?php if (!empty($quartiers)): ?>
     const ctx = document.getElementById('quartierChart').getContext('2d');
     new Chart(ctx, {
@@ -276,4 +277,6 @@ require_once '../includes/navbar.php';
     <?php endif; ?>
 </script>
 
-<?php require_once '../includes/footer.php'; ?>
+<?php
+require_once $includesPath . 'footer.php';
+?>
