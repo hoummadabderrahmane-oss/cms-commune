@@ -1,13 +1,6 @@
--- ============================================
--- CMS Baladiya - Base de données
--- ============================================
-
 CREATE DATABASE IF NOT EXISTS sgc_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE sgc_db;
 
--- ============================================
--- Table: utilisateurs
--- ============================================
 CREATE TABLE IF NOT EXISTS utilisateurs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
@@ -24,9 +17,6 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ============================================
--- Table: citoyens
--- ============================================
 CREATE TABLE IF NOT EXISTS citoyens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cin VARCHAR(20) UNIQUE NOT NULL,
@@ -55,9 +45,6 @@ CREATE TABLE IF NOT EXISTS citoyens (
     FOREIGN KEY (created_by) REFERENCES utilisateurs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ============================================
--- Table: documents
--- ============================================
 CREATE TABLE IF NOT EXISTS documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     citoyen_id INT NOT NULL,
@@ -74,9 +61,6 @@ CREATE TABLE IF NOT EXISTS documents (
     FOREIGN KEY (created_by) REFERENCES utilisateurs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ============================================
--- Table: journal_activites (Log)
--- ============================================
 CREATE TABLE IF NOT EXISTS journal_activites (
     id INT AUTO_INCREMENT PRIMARY KEY,
     utilisateur_id INT,
@@ -89,24 +73,5 @@ CREATE TABLE IF NOT EXISTS journal_activites (
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ============================================
--- Index
--- ============================================
-CREATE INDEX idx_citoyens_cin ON citoyens(cin);
-CREATE INDEX idx_citoyens_nom ON citoyens(nom, prenom);
-CREATE INDEX idx_citoyens_quartier ON citoyens(quartier);
-CREATE INDEX idx_citoyens_statut ON citoyens(statut);
-CREATE INDEX idx_documents_citoyen ON documents(citoyen_id);
-
--- ============================================
--- Données initiales
--- ============================================
 INSERT IGNORE INTO utilisateurs (nom, prenom, email, mot_de_passe, role, commune, statut) 
 VALUES ('Admin', 'Principal', 'admin@commune.ma', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'super_admin', 'Commune Principale', 1);
--- Mot de passe: password
-
--- Données de test
-INSERT IGNORE INTO citoyens (cin, nom, prenom, sexe, quartier, telephone, profession, statut) VALUES
-('AB123456', 'Alami', 'Mohamed', 'M', 'Hassan', '0612345678', 'Enseignant', 'actif'),
-('CD789012', 'Bennani', 'Fatima', 'F', 'Agdal', '0623456789', 'Médecin', 'actif'),
-('EF345678', 'El Fassi', 'Ahmed', 'M', 'Maarif', '0634567890', 'Commerçant', 'actif');
