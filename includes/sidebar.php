@@ -22,21 +22,21 @@ $currentUser = [
     'avatar'  => $_SESSION['avatar'] ?? 'default.png'
 ];
 
-// Permission helpers (defined here so they work everywhere)
-function hasRole(string $role): bool {
-    global $currentUser;
-    return $currentUser['role'] === $role || $currentUser['role'] === 'super_admin';
+// Permission helpers - only define if not already defined by auth_check.php
+if (!function_exists('hasRole')) {
+    function hasRole(string $role): bool {
+        global $currentUser;
+        return $currentUser['role'] === $role || $currentUser['role'] === 'super_admin';
+    }
 }
 
-function isSuperAdmin(): bool {
-    global $currentUser;
-    return $currentUser['role'] === 'super_admin';
+if (!function_exists('isSuperAdmin')) {
+    function isSuperAdmin(): bool {
+        global $currentUser;
+        return $currentUser['role'] === 'super_admin';
+    }
 }
 
-function isAdmin(): bool {
-    global $currentUser;
-    return $currentUser['role'] === 'admin' || $currentUser['role'] === 'super_admin';
-}
-
-// Navigation state
-$currentPage = basename($_SERVER['PHP_SELF']);
+if (!function_exists('isAdmin')) {
+    function isAdmin(): bool {
+        global $currentUser;
