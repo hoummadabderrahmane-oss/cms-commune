@@ -19,10 +19,10 @@ if (empty($_SESSION['csrf'])) {
 
 $typeLabels = [
     'extrait_naissance' => 'Extrait de naissance',
-    'certificat_residence' => 'Certificat de résidence',
+    'certificat_residence' => 'Certificat de residence',
     'attestation_mariage' => 'Attestation de mariage',
-    'certificat_deces' => 'Certificat de décès',
-    'carte_identite' => 'Carte d'identité',
+    'certificat_deces' => 'Certificat de deces',
+    'carte_identite' => 'Carte d identite',
     'autre' => 'Autre'
 ];
 
@@ -35,7 +35,7 @@ $typeColors = [
     'autre' => 'secondary'
 ];
 
-$statutLabels = ['valide' => 'Valide', 'expire' => 'Expiré', 'annule' => 'Annulé'];
+$statutLabels = ['valide' => 'Valide', 'expire' => 'Expire', 'annule' => 'Annule'];
 $statutColors = ['valide' => 'success', 'expire' => 'warning', 'annule' => 'danger'];
 
 /* ---------- Search + filter + pagination ---------- */
@@ -133,7 +133,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                     <div>
                         <div class="h4 mb-0 fw-bold"><?= number_format($docsValides) ?></div>
-                        <div class="text-muted small">Validés</div>
+                        <div class="text-muted small">Valides</div>
                     </div>
                 </div>
             </div>
@@ -148,7 +148,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                     <div>
                         <div class="h4 mb-0 fw-bold"><?= number_format($docsExpires) ?></div>
-                        <div class="text-muted small">Expirés</div>
+                        <div class="text-muted small">Expires</div>
                     </div>
                 </div>
             </div>
@@ -163,7 +163,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                     <div>
                         <div class="h4 mb-0 fw-bold"><?= number_format($docsAnnules) ?></div>
-                        <div class="text-muted small">Annulés</div>
+                        <div class="text-muted small">Annules</div>
                     </div>
                 </div>
             </div>
@@ -182,7 +182,7 @@ require_once __DIR__ . '/../includes/header.php';
             <form method="GET" class="row g-2 mb-3">
                 <div class="col-md-4">
                     <input type="text" name="q" class="form-control"
-                           placeholder="Rechercher (N° doc, nom, CIN)..."
+                           placeholder="Rechercher (N doc, nom, CIN)..."
                            value="<?= htmlspecialchars($q) ?>">
                 </div>
                 <div class="col-md-3">
@@ -203,7 +203,7 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Filtrer</button>
-                    <a href="index.php" class="btn btn-outline-secondary">Réinitialiser</a>
+                    <a href="index.php" class="btn btn-outline-secondary">Reinitialiser</a>
                 </div>
             </form>
 
@@ -212,11 +212,11 @@ require_once __DIR__ . '/../includes/header.php';
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>N° Document</th>
+                            <th>N Document</th>
                             <th>Type</th>
                             <th>Citoyen</th>
                             <th>CIN</th>
-                            <th>Date émission</th>
+                            <th>Date emission</th>
                             <th>Date expiration</th>
                             <th>Statut</th>
                             <th class="text-end">Actions</th>
@@ -224,7 +224,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </thead>
                     <tbody>
                     <?php if (!$documents): ?>
-                        <tr><td colspan="9" class="text-center text-muted py-4">Aucun document trouvé.</td></tr>
+                        <tr><td colspan="9" class="text-center text-muted py-4">Aucun document trouve.</td></tr>
                     <?php else: ?>
                         <?php foreach ($documents as $i => $d): ?>
                         <tr>
@@ -237,7 +237,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <td><?= $d['date_expiration'] ? date('d/m/Y', strtotime($d['date_expiration'])) : '—' ?></td>
                             <td><span class="badge bg-<?= $statutColors[$d['statut']] ?? 'secondary' ?>"><?= $statutLabels[$d['statut']] ?? $d['statut'] ?></span></td>
                             <td class="text-end text-nowrap">
-                                <a href="generer.php?id=<?= (int)$d['id'] ?>" class="btn btn-sm btn-outline-success" title="Générer / Imprimer" target="_blank">
+                                <a href="generer.php?id=<?= (int)$d['id'] ?>" class="btn btn-sm btn-outline-success" title="Generer / Imprimer" target="_blank">
                                     <i class="bi bi-printer"></i>
                                 </a>
                                 <a href="edit.php?id=<?= (int)$d['id'] ?>" class="btn btn-sm btn-outline-warning" title="Modifier">
