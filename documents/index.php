@@ -307,6 +307,13 @@ require_once __DIR__ . '/../includes/header.php';
         justify-content: space-between;
     }
 
+    /* Stat icon box image styling */
+    .stat-icon-box img {
+        max-width: 100%;
+        max-height: 100%;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
     /* Pagination modern */
     .pagination-modern .page-link {
         border: none;
@@ -358,8 +365,8 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="col-xl-3 col-md-6">
             <div class="card doc-stat-card shadow-sm border-0">
                 <div class="card-body d-flex align-items-center">
-                    <div class="stat-icon-box bg-primary bg-opacity-10 text-primary me-3">
-                        <i class="bi bi-files"></i>
+                    <div class="stat-icon-box bg-primary bg-opacity-10 text-primary me-3" style="padding: 8px;">
+                        <img src="../assets/images/logo-documents.png" alt="Documents" style="width: 40px; height: 40px; object-fit: contain;">
                     </div>
                     <div class="flex-grow-1">
                         <div class="stat-value text-primary"><?= number_format($totalDocs) ?></div>
@@ -374,8 +381,8 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="col-xl-3 col-md-6">
             <div class="card doc-stat-card shadow-sm border-0">
                 <div class="card-body d-flex align-items-center">
-                    <div class="stat-icon-box bg-success bg-opacity-10 text-success me-3">
-                        <i class="bi bi-check-circle"></i>
+                    <div class="stat-icon-box bg-success bg-opacity-10 text-success me-3" style="padding: 4px;">
+                        <img src="../assets/images/logo-valide.png" alt="Valide" style="width: 48px; height: 48px; object-fit: contain;">
                     </div>
                     <div class="flex-grow-1">
                         <div class="stat-value text-success"><?= number_format($docsValides) ?></div>
@@ -390,8 +397,8 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="col-xl-3 col-md-6">
             <div class="card doc-stat-card shadow-sm border-0">
                 <div class="card-body d-flex align-items-center">
-                    <div class="stat-icon-box bg-warning bg-opacity-10 text-warning me-3">
-                        <i class="bi bi-clock-history"></i>
+                    <div class="stat-icon-box bg-warning bg-opacity-10 text-warning me-3" style="padding: 4px;">
+                        <img src="../assets/images/logo-expire.png" alt="Expire" style="width: 48px; height: 48px; object-fit: contain;">
                     </div>
                     <div class="flex-grow-1">
                         <div class="stat-value text-warning"><?= number_format($docsExpires) ?></div>
@@ -406,8 +413,8 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="col-xl-3 col-md-6">
             <div class="card doc-stat-card shadow-sm border-0">
                 <div class="card-body d-flex align-items-center">
-                    <div class="stat-icon-box bg-danger bg-opacity-10 text-danger me-3">
-                        <i class="bi bi-x-octagon"></i>
+                    <div class="stat-icon-box bg-danger bg-opacity-10 text-danger me-3" style="padding: 4px;">
+                        <img src="../assets/images/logo-annule.png" alt="Annule" style="width: 48px; height: 48px; object-fit: contain;">
                     </div>
                     <div class="flex-grow-1">
                         <div class="stat-value text-danger"><?= number_format($docsAnnules) ?></div>
