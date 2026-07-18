@@ -110,7 +110,7 @@ $docsByType = $stmt->fetchAll();
 $pageTitle = 'Gestion des documents';
 
 // Compute asset base URL for images (handles subfolder installations)
-$assetBase = rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/\');
+$assetBase = rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/\\');
 $assetBase = $assetBase === '' ? '' : $assetBase;
 
 require_once __DIR__ . '/../includes/header.php';
