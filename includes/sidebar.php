@@ -40,3 +40,5 @@ if (!function_exists('isSuperAdmin')) {
 if (!function_exists('isAdmin')) {
     function isAdmin(): bool {
         global $currentUser;
+    }
+}
